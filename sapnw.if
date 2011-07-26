@@ -29,3 +29,12 @@ interface(`sapnw_rw_shm',`
 	allow $1 sapnw_t:shm rw_shm_perms;
 	allow $1 sapnw_script_t:shm rw_shm_perms;
 ')
+
+
+
+interface(`sapnw_admin',`
+	gen_require(`
+		type sapnw_exec_t;
+	')
+	###
+')

@@ -133,4 +133,8 @@ interface(`maxdb_read_config',`
 ## <rolecap/>
 #
 interface(`maxdb_admin',`
+	gen_require(`
+		type maxdb_exec_t;
+	')
+	
 ')
