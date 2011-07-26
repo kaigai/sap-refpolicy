@@ -1,0 +1,107 @@
+policy_module(maxdb, 1.0.12)
+
+########################################
+#
+# Declarations
+#
+
+type maxdb_t;
+type maxdb_exec_t;
+init_daemon_domain(maxdb_t, maxdb_exec_t)
+
+type maxdb_db_t;
+files_type(maxdb_db_t)
+
+type maxdb_etc_t;
+files_type(maxdb_etc_t)
+
+type maxdb_initrc_exec_t;
+init_script_file(maxdb_initrc_exec_t)
+
+type maxdb_log_t;
+logging_log_file(maxdb_log_t)
+
+type maxdb_tmp_t;
+files_tmp_file(maxdb_tmp_t)
+
+type maxdb_var_lib_t;
+files_type(maxdb_var_lib_t)
+
+########################################
+#
+# Local policy
+#
+
+allow maxdb_t self:process { execmem execstack setpgid setsched signal signull };
+
+allow maxdb_t self:capability { dac_override setgid setuid };
+
+allow maxdb_t self:fifo_file manage_fifo_file_perms;
+allow maxdb_t self:sem create_sem_perms;
+allow maxdb_t self:shm create_shm_perms;
+allow maxdb_t self:tcp_socket create_stream_socket_perms;
+allow maxdb_t self:udp_socket create_socket_perms;
+
+fs_getattr_xattr_fs(maxdb_t)
+fs_getattr_tmpfs(maxdb_t)
+
+manage_dirs_pattern(maxdb_t, maxdb_db_t, maxdb_db_t)
+manage_files_pattern(maxdb_t, maxdb_db_t, maxdb_db_t)
+manage_fifo_files_pattern(maxdb_t, maxdb_db_t, maxdb_db_t)
+
+maxdb_exec(maxdb_t)
+
+manage_dirs_pattern(maxdb_t, maxdb_tmp_t, maxdb_tmp_t)
+manage_files_pattern(maxdb_t, maxdb_tmp_t, maxdb_tmp_t)
+manage_sock_files_pattern(maxdb_t, maxdb_tmp_t, maxdb_tmp_t)
+
+files_tmp_filetrans(maxdb_t, maxdb_tmp_t, { sock_file })
+fs_tmpfs_filetrans(maxdb_t, maxdb_tmp_t, { file dir })
+
+manage_dirs_pattern(maxdb_t, maxdb_var_lib_t, maxdb_var_lib_t)
+manage_files_pattern(maxdb_t, maxdb_var_lib_t, maxdb_var_lib_t)
+files_var_lib_filetrans(maxdb_t, maxdb_var_lib_t, { file dir })
+
+allow maxdb_t maxdb_etc_t:file read_file_perms;
+allow maxdb_t maxdb_etc_t:lnk_file { getattr read };
+allow maxdb_t maxdb_etc_t:dir list_dir_perms;
+
+kernel_read_system_state(maxdb_t)
+kernel_read_kernel_sysctls(maxdb_t)
+
+miscfiles_read_localization(maxdb_t)
+
+dev_read_rand(maxdb_t)
+dev_read_urand(maxdb_t)
+
+sysnet_read_config(maxdb_t)
+
+corecmd_exec_bin(maxdb_t)
+
+corenet_all_recvfrom_unlabeled(maxdb_t)
+corenet_all_recvfrom_netlabel(maxdb_t)
+corenet_tcp_sendrecv_generic_if(maxdb_t)
+corenet_udp_sendrecv_generic_if(maxdb_t)
+corenet_tcp_sendrecv_generic_node(maxdb_t)
+corenet_udp_sendrecv_generic_node(maxdb_t)
+corenet_tcp_sendrecv_all_ports(maxdb_t)
+corenet_udp_sendrecv_all_ports(maxdb_t)
+corenet_tcp_bind_generic_node(maxdb_t)
+corenet_tcp_bind_maxdb_port(maxdb_t)
+corenet_tcp_connect_maxdb_port(maxdb_t)
+corenet_sendrecv_maxdb_client_packets(maxdb_t)
+corenet_sendrecv_maxdb_server_packets(maxdb_t)
+
+files_getattr_var_lib_dirs(maxdb_t)
+files_read_etc_runtime_files(maxdb_t)
+files_read_etc_files(maxdb_t)
+files_read_usr_files(maxdb_t)
+files_search_var_lib(maxdb_t)
+
+kernel_read_system_state(maxdb_t)
+
+miscfiles_read_localization(maxdb_t)
+
+optional_policy(`
+	sapnw_rw_shm(maxdb_t)
+')

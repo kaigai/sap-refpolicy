@@ -1,0 +1,31 @@
+## <summary>Policy for SAP NetWeaver</summary>
+
+########################################
+## <summary>
+##	Execute SAP NW Scripts in the sapnw_script_t domain
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed to transition.
+##      </summary>
+## </param>
+#
+interface(`sapnw_domtrans_script',`
+	gen_require(`
+		type sapnw_script_t, sapnw_script_exec_t;
+	')
+
+	corecmd_search_bin($1)
+	domtrans_pattern($1, sapnw_script_exec_t, sapnw_script_t)
+')
+
+
+
+interface(`sapnw_rw_shm',`
+	gen_require(`
+		type sapnw_t;
+		type sapnw_script_t;
+	')
+	allow $1 sapnw_t:shm rw_shm_perms;
+	allow $1 sapnw_script_t:shm rw_shm_perms;
+')

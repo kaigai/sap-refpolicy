@@ -1,0 +1,166 @@
+policy_module(sapnw, 1.0.14)
+
+########################################
+#
+# Declarations
+#
+
+type sapnw_t;
+type sapnw_exec_t;
+init_daemon_domain(sapnw_t, sapnw_exec_t)
+
+type sapnw_oscol_t;
+type sapnw_oscol_exec_t;
+init_daemon_domain(sapnw_oscol_t, sapnw_oscol_exec_t)
+
+type sapnw_script_t;
+domain_type(sapnw_script_t)
+
+type sapnw_script_exec_t;
+domain_entry_file(sapnw_script_t, sapnw_script_exec_t)
+
+type sapnw_etc_t;
+files_config_file(sapnw_etc_t)
+
+type sapnw_log_t;
+logging_log_file(sapnw_log_t)
+
+type sapnw_tmp_t;
+files_tmp_file(sapnw_tmp_t)
+
+type sapnw_initrc_exec_t;
+init_script_file(sapnw_initrc_exec_t)
+
+########################################
+#
+# SAP NetWeaver local policy
+#
+
+allow sapnw_t self:capability { dac_override setgid setuid };
+allow sapnw_t self:process { sigkill signal setpgid };
+allow sapnw_t self:fifo_file manage_fifo_file_perms;
+allow sapnw_t self:sem create_sem_perms;
+allow sapnw_t self:shm create_shm_perms;
+
+can_exec(sapnw_t, sapnw_exec_t)
+
+corecmd_exec_bin(sapnw_t)
+corecmd_exec_shell(sapnw_t)
+
+allow sapnw_t:self create_tcp_socket_perms;
+allow sapnw_t:self create_udp_socket_perms;
+corenet_all_recvfrom_unlabeled(sapnw_t)
+corenet_all_recvfrom_netlabel(sapnw_t)
+corenet_tcp_sendrecv_generic_if(sapnw_t)
+corenet_udp_sendrecv_generic_if(sapnw_t)
+corenet_raw_sendrecv_generic_if(sapnw_t)
+corenet_tcp_sendrecv_generic_node(sapnw_t)
+corenet_udp_sendrecv_generic_node(sapnw_t)
+corenet_raw_sendrecv_generic_node(sapnw_t)
+corenet_tcp_sendrecv_all_ports(sapnw_t)
+corenet_udp_sendrecv_all_ports(sapnw_t)
+corenet_tcp_bind_generic_node(sapnw_t)
+corenet_udp_bind_generic_node(sapnw_t)
+corenet_tcp_bind_sapnw_port(sapnw_t)
+corenet_udp_bind_sapnw_port(sapnw_t)
+
+dev_read_sysfs(sapnw_t)
+dev_read_rand(sapnw_t)
+dev_read_urand(sapnw_t)
+
+files_read_etc_files(sapnw_t)
+files_read_usr_files(sapnw_t)
+
+fs_tmpfs_filetrans(sapnw_t, sapnw_tmp_t, {file dir})
+
+init_read_script_tmp_files(sapnw_t)
+init_read_utmp(sapnw_t)
+
+kernel_list_proc(sapnw_t)
+domain_read_all_domains_state(sapnw_t)
+kernel_read_kernel_sysctls(sapnw_t)
+kernel_read_network_state(sapnw_t)
+kernel_read_vm_sysctls(sapnw_t)
+
+files_tmp_filetrans(sapnw_t, sapnw_tmp_t, {file dir sock_file})
+manage_dirs_pattern(sapnw_t, sapnw_tmp_t, sapnw_tmp_t)
+manage_files_pattern(sapnw_t, sapnw_tmp_t, sapnw_tmp_t)
+manage_sock_files_pattern(sapnw_t, sapnw_tmp_t, sapnw_tmp_t)
+
+
+sysnet_exec_ifconfig(sapnw_t)
+
+
+# SAP NW create logfiles as /home/XXXadm/*.log
+userdom_manage_user_home_dirs(sapnw_t)
+userdom_user_home_content_filetrans(sapnw_t, sapnw_log_t, file)
+userdom_read_user_home_content_files(sapnw_t)
+
+
+term_use_ptmx(sapnw_t)
+term_getattr_pty_fs(sapnw_t)
+
+optional_policy(`
+	consoletype_exec(sapnw_t)
+')
+optional_policy(`
+	hostname_exec(sapnw_t)
+')
+optional_policy(`
+	maxdb_stream_connect(sapnw_t)
+	maxdb_tcp_connect(sapnw_t)
+	maxdb_read_config(sapnw_t)
+')
+
+########################################
+#
+# SAP OSCol local policy
+#
+allow sapnw_oscol_t self:capability { chown dac_override fsetid };
+allow sapnw_oscol_t self:fifo_file rw_fifo_file_perms;
+allow sapnw_oscol_t self:shm create_shm_perms;
+
+manage_dirs_pattern(sapnw_oscol_t, sapnw_log_t, sapnw_log_t)
+manage_files_pattern(sapnw_oscol_t, sapnw_log_t, sapnw_log_t)
+
+domain_read_all_domains_state(sapnw_oscol_t)
+
+kernel_read_network_state(sapnw_oscol_t)
+kernel_read_system_state(sapnw_oscol_t)
+kernel_read_kernel_sysctls(sapnw_oscol_t)
+kernel_read_fs_sysctls(sapnw_oscol_t)
+
+corecmd_exec_bin(sapnw_oscol_t)
+corecmd_exec_shell(sapnw_oscol_t)
+
+files_read_etc_files(sapnw_oscol_t)
+files_read_usr_files(sapnw_oscol_t)
+
+fs_getattr_xattr_fs(sapnw_oscol_t)
+fs_getattr_noxattr_fs(sapnw_oscol_t)
+fs_getattr_rpc_pipefs(sapnw_oscol_t)
+
+fs_tmpfs_filetrans(sapnw_oscol_t, sapnw_tmp_t, { file dir })
+
+dev_read_sysfs(sapnw_oscol_t)
+
+init_read_state(sapnw_oscol_t)
+
+
+manage_dirs_pattern(sapnw_oscol_t, sapnw_tmp_t, sapnw_tmp_t)
+manage_files_pattern(sapnw_oscol_t, sapnw_tmp_t, sapnw_tmp_t)
+
+miscfiles_read_localization(sapnw_oscol_t)
+
+
+rpc_search_nfs_state_data(sapnw_oscol_t)
+
+term_getattr_pty_fs(sapnw_oscol_t)
+
+########################################
+#
+# SAP NW Scripts local policy
+#
+role system_r types sapnw_script_t;
+
+

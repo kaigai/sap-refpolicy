@@ -1,0 +1,32 @@
+policy_module(sapnw-misc, 1.0.1)
+
+# The following types should be declared in kernel/corenetwork.te.in,
+# however, we have the declaration of them for modular purpose.
+#
+# Don't forget
+#   semanage port -a -t maxdb_port_t -r s0 -p tcp 7200
+#   semanage port -a -t maxdb_port_t -r s0 -p tcp 7210
+#   semanage port -a -t maxdb_port_t -r s0 -p tcp 7269-7270
+#
+#   semanage port -a -t sapnw_port_t -r s0 -p tcp <# of port>
+#
+gen_require(`
+	attribute port_type;
+	attribute packet_type;
+	attribute client_packet_type;
+	attribute server_packet_type;
+')
+type maxdb_port_t, port_type;
+type maxdb_client_packet_t, packet_type, client_packet_type;
+type maxdb_server_packet_t, packet_type, server_packet_type;
+
+type sapnw_port_t, port_type;
+type sapnw_client_packet_t, packet_type, client_packet_type;
+type sapnw_server_packet_t, packet_type, server_packet_type;
+
+optional_policy(`
+	gen_require(`
+		type unconfined_t;
+	')
+	sapnw_domtrans_script(unconfined_t)
+')

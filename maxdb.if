@@ -1,0 +1,136 @@
+## <summary>Policy for MaxDB</summary>
+
+######################################
+## <summary>
+##	Execute MaxDB in the maxdb_t domain
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed to transition.
+##	</summary>
+## </param>
+#
+interface(`maxdb_domtrans',`
+	gen_require(`
+		type maxdb_t, maxdb_exec_t;
+	')
+
+	domtrans_pattern($1, maxdb_exec_t, maxdb_t)
+')
+
+########################################
+## <summary>
+##	Send a generic signal to MaxDB
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+
+
+
+########################################
+## <summary>
+##	Execute maxdb executable in the caller domain
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowd access.
+##	</summary>
+## </param>
+#
+interface(`maxdb_exec',`
+	gen_require(`
+		type maxdb_exec_t;
+	')
+
+	can_exec($1, maxdb_exec_t)
+')
+
+
+########################################
+## <summary>
+##	Allow the specified domain to connect to maxdb with a tcp socket.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`maxdb_tcp_connect',`
+	gen_require(`
+		type maxdb_t;
+	')
+	corenet_tcp_recvfrom_labeled($1, maxdb_t)
+	corenet_tcp_sendrecv_maxdb_port($1)
+	corenet_tcp_connect_maxdb_port($1)
+	corenet_sendrecv_maxdb_client_packets($1)
+')
+
+########################################
+## <summary>
+##	Allow the specified domain to connect to maxdb with a unix socket.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`maxdb_stream_connect',`
+        gen_require(`
+		type maxdb_t, maxdb_tmp_t;
+
+                type postgresql_t, postgresql_var_run_t, postgresql_tmp_t;
+        ')
+
+	allow $1 maxdb_t:unix_stream_socket connectto;
+	allow $1 maxdb_tmp_t:sock_file write;
+')
+
+########################################
+## <summary>
+##	Allow the specified domain to read maxdb's config
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`maxdb_read_config',`
+	gen_require(`
+		type maxdb_etc_t;
+	')
+
+	files_search_etc($1)
+	allow $1 maxdb_etc_t:dir list_dir_perms;
+	allow $1 maxdb_etc_t:file read_file_perms;
+	allow $1 maxdb_etc_t:lnk_file read_lnk_file_perms;
+')
+
+
+
+########################################
+## <summary>
+##	All of the rules required to administrate an maxdb environment
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <param name="role">
+##	<summary>
+##	The role to be allowed to manage the maxdb domain.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`maxdb_admin',`
+')

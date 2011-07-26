@@ -1,0 +1,82 @@
+## <summary>Policy for SAP NetWeaver (MISC)</summary>
+
+interface(`corenet_tcp_sendrecv_maxdb_port',`
+	gen_require(`
+		type maxdb_port_t;
+	')
+
+	allow $1 maxdb_port_t:tcp_socket { send_msg recv_msg };
+')
+
+interface(`corenet_tcp_bind_maxdb_port',`
+	gen_require(`
+		type maxdb_port_t;
+	')
+
+	allow $1 maxdb_port_t:tcp_socket name_bind;
+')
+
+interface(`corenet_tcp_connect_maxdb_port',`
+	gen_require(`
+		type maxdb_port_t;
+	')
+	allow $1 maxdb_port_t:tcp_socket name_connect;
+')
+
+interface(`corenet_sendrecv_maxdb_server_packets',`
+	gen_require(`
+		type maxdb_server_packet_t;
+	')
+
+	allow $1 maxdb_server_packet_t:packet {send recv};
+')
+
+interface(`corenet_sendrecv_maxdb_client_packets',`
+	gen_require(`
+		type maxdb_client_packet_t;
+	')
+	allow $1 maxdb_client_packet_t:packet {send recv};
+')
+
+interface(`corenet_tcp_sendrecv_sapnw_port',`
+	gen_require(`
+		type sapnw_port_t;
+	')
+
+	allow $1 sapnw_port_t:tcp_socket { send_msg recv_msg };
+')
+
+interface(`corenet_tcp_bind_sapnw_port',`
+	gen_require(`
+		type sapnw_port_t;
+	')
+	allow $1 sapnw_port_t:tcp_socket name_bind;
+')
+
+interface(`corenet_udp_bind_sapnw_port',`
+	gen_require(`
+		type sapnw_port_t;
+	')
+	allow $1 sapnw_port_t:udp_socket name_bind;
+')
+
+interface(`corenet_tcp_connect_sapnw_port',`
+	gen_require(`
+		type sapnw_port_t;
+	')
+	allow $1 sapnw_port_t:tcp_socket name_connect;
+')
+
+interface(`corenet_sendrecv_sapnw_server_packets',`
+	gen_require(`
+		type sapnw_server_packet_t;
+	')
+	allow $1 sapnw_server_packet_t:packet {send recv};
+')
+
+interface(`corenet_sendrecv_sapnw_client_packets',`
+	gen_require(`
+		type sapnw_client_packet_t;
+	')
+	allow $1 sapnw_client_packet_t:packet {send recv};
+')
