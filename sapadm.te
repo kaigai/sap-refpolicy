@@ -1,0 +1,48 @@
+policy_module(sapadm, 1.0.0)
+
+########################################
+#
+# Declarations
+#
+
+## <desc>
+## <p>
+## Allow sapadm to manage files in users home directories
+## </p>
+## </desc>
+gen_tunable(sapadm_manage_user_files, false)
+
+## <desc>
+## <p>
+## Allow sapadm to read files in users home directories
+## </p>
+## </desc>
+gen_tunable(sapadm_read_user_files, false)
+
+role sapadm_r;
+
+userdom_base_user_template(sapadm)
+
+########################################
+#
+# SAP administrator local policy
+#
+
+tunable_policy(`sapadm_manage_user_files',`
+	userdom_manage_user_home_content_files(sapadm_t)
+	userdom_read_user_tmp_files(sapadm_t)
+	userdom_write_user_tmp_files(sapadm_t)
+')
+
+tunable_policy(`sapadm_read_user_files',`
+	userdom_read_user_home_content_files(sapadm_t)
+	userdom_read_user_tmp_files(sapadm_t)
+')
+
+optional_policy(`
+	maxdb_admin(sapadm_t, sapadm_r)
+')
+
+optional_policy(`
+	sapnw_admin(sapadm_t, sapadm_r)
+')

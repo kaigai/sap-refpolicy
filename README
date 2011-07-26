@@ -1,0 +1,7 @@
+SELinux Policy Module of SAP NetWeaver 7.3
+===========================================
+
+services/sapnw.te
+services/maxdb.te
+services/sapadm.te
+
