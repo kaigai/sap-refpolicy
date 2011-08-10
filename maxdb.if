@@ -114,7 +114,62 @@ interface(`maxdb_read_config',`
 	allow $1 maxdb_etc_t:lnk_file read_lnk_file_perms;
 ')
 
+########################################
+## <summary>
+##	Search the directories that contain MaxDB
+##	database storage.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`maxdb_search_db',`
+	gen_require(`
+		type maxdb_db_t;
+	')
 
+	files_search_var_lib($1)
+	getattr_files_pattern($1, maxdb_db_t, maxdb_db_t)
+')
+
+interface(`maxdb_exec_cmd',`
+	gen_require(`
+		type maxdb_exec_t;
+		type maxdb_initrc_exec_t;
+	')
+	corecmd_search_bin($1)
+	can_exec($1, maxdb_exec_t)
+	can_exec($1, maxdb_initrc_exec_t)
+')
+
+interface(`maxdb_create_work_files',`
+	gen_require(`
+		type maxdb_work_t;
+	')
+	manage_dirs_pattern($1, maxdb_work_t, maxdb_work_t)
+	manage_files_pattern($1, maxdb_work_t, maxdb_work_t)
+	manage_lnk_files_pattern($1, maxdb_work_t, maxdb_work_t)
+')
+
+interface(`maxdb_rw_work_files',`
+	gen_require(`
+		type maxdb_work_t;
+	')
+	list_dirs_pattern($1, maxdb_work_t, maxdb_work_t)
+	rw_files_pattern($1, maxdb_work_t, maxdb_work_t)
+	rw_lnk_files_pattern($1, maxdb_work_t, maxdb_work_t)
+')
+
+interface(`maxdb_read_work_files',`
+	gen_require(`
+		type maxdb_work_t;
+	')
+	list_dirs_pattern($1, maxdb_work_t, maxdb_work_t)
+	read_files_pattern($1, maxdb_work_t, maxdb_work_t)
+	read_lnk_files_pattern($1, maxdb_work_t, maxdb_work_t)
+')
 
 ########################################
 ## <summary>
@@ -134,7 +189,16 @@ interface(`maxdb_read_config',`
 #
 interface(`maxdb_admin',`
 	gen_require(`
-		type maxdb_exec_t;
+		type maxdb_t;
+		type maxdb_initrc_exec_t;
 	')
-	
+	allow $1 maxdb_t:process { ptrace signal_perms };
+	ps_process_pattern($1, maxdb_t)
+
+	init_labeled_script_domtrans($1, maxdb_initrc_exec_t)
+	role_transition $2 maxdb_initrc_exec_t system_r;
+	allow $2 system_r;
+
+	maxdb_tcp_connect($1)
+	maxdb_stream_connect($1)
 ')

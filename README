@@ -5,3 +5,10 @@ services/sapnw.te
 services/maxdb.te
 services/sapadm.te
 
+
+
+Configuration Memo
+==================
+# semanage user -a -L s0 -r s0-s0:c0.c1023 -R "staff_r sapadm_r" sapadm_u
+# semanage login -a -s sapadm_u -r s0 necadm
+# cp /etc/selinux/targeted/users/staff_u /etc/selinux/targeted/users/sapadm_u  

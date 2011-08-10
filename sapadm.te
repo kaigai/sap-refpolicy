@@ -1,4 +1,4 @@
-policy_module(sapadm, 1.0.0)
+policy_module(sapadm, 1.0.1)
 
 ########################################
 #
@@ -10,16 +10,18 @@ policy_module(sapadm, 1.0.0)
 ## Allow sapadm to manage files in users home directories
 ## </p>
 ## </desc>
-gen_tunable(sapadm_manage_user_files, false)
+gen_tunable(sapadm_manage_user_files, true)
 
 ## <desc>
 ## <p>
 ## Allow sapadm to read files in users home directories
 ## </p>
 ## </desc>
-gen_tunable(sapadm_read_user_files, false)
+gen_tunable(sapadm_read_user_files, true)
 
 role sapadm_r;
+
+
 
 userdom_base_user_template(sapadm)
 

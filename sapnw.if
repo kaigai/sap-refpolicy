@@ -21,20 +21,143 @@ interface(`sapnw_domtrans_script',`
 
 
 
-interface(`sapnw_rw_shm',`
+########################################
+## <summary>
+##	Allow a domain to create shared memory segment
+##	to communicate with SAP NetWeaver.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`sapnw_create_shared_mem',`
 	gen_require(`
-		type sapnw_t;
-		type sapnw_script_t;
+		attribute sapnw_shared_mem_type;
 	')
-	allow $1 sapnw_t:shm rw_shm_perms;
-	allow $1 sapnw_script_t:shm rw_shm_perms;
+
+	typeattribute $1 sapnw_shared_mem_type;
+	allow $1 sapnw_shared_mem_type:shm create_shm_perms;
 ')
 
+########################################
+## <summary>
+##	Allow a domain to create shared memory segment
+##	to communicate with SAP NetWeaver.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`sapnw_rw_shared_mem',`
+	gen_require(`
+		attribute sapnw_shared_mem_type;
+	')
+	allow $1 sapnw_shared_mem_type:shm rw_shm_perms;
+')
 
+########################################
+## <summary>
+##	Allow a domain to create tmpfs entries corresponding to
+##	SAP NetWeaver.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`sapnw_create_tmpfs_files',`
+	gen_require(`
+		type sapnw_tmpfs_t;
+	')
 
+	fs_search_tmpfs($1)
+	fs_tmpfs_filetrans($1, sapnw_tmpfs_t, file)
+	manage_files_pattern($1, sapnw_tmpfs_t, sapnw_tmpfs_t)
+')
+
+########################################
+## <summary>
+##	Allow a domain to create tmp files associated with
+##	SAP NetWeaver.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`sapnw_create_tmp_files',`
+	gen_require(`
+		type sapnw_tmp_t;
+	')
+	files_tmp_filetrans($1, sapnw_tmp_t, {file dir sock_file})
+	manage_dirs_pattern($1, sapnw_tmp_t, sapnw_tmp_t)
+	manage_files_pattern($1, sapnw_tmp_t, sapnw_tmp_t)
+	manage_sock_files_pattern($1, sapnw_tmp_t, sapnw_tmp_t)
+')
+
+########################################
+## <summary>
+##	Allow a domain to create working files associated with
+##	SAP NetWeaver.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`sapnw_create_work_files',`
+	gen_require(`
+		type sapnw_work_t;
+	')
+	manage_dirs_pattern($1, sapnw_work_t, sapnw_work_t)
+	manage_files_pattern($1, sapnw_work_t, sapnw_work_t)
+	manage_sock_files_pattern($1, sapnw_work_t, sapnw_work_t)
+')
+
+########################################
+## <summary>
+##	All of the rules required to administrate an SAP NetWeaver environment
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <param name="role">
+##	<summary>
+##	The role to be allowed to manage the sapnw domain.
+##	</summary>
+## </param>
+## <rolecap/>
+#
 interface(`sapnw_admin',`
 	gen_require(`
-		type sapnw_exec_t;
+		attribute sapnw_admin_type;
+		type sapnw_t;
+		type sapnw_oscol_t;
+		type sapnw_initrc_exec_t;
 	')
-	###
+	typeattribute $1 sapnw_admin_type;
+
+	allow $1 sapnw_t:process { ptrace signal_perms };
+	allow $1 sapnw_oscol_t:process { ptrace signal_perms };
+	ps_process_pattern($1, sapnw_t)
+	ps_process_pattern($1, sapnw_oscol_t)
+
+	init_labeled_script_domtrans($1, sapnw_initrc_exec_t)
+	domain_system_change_exemption($1)
+	role_transition $2 sapnw_initrc_exec_t system_r;
+	allow $2 system_r;
+
+	sapnw_create_shared_mem($1)
+	sapnw_create_tmpfs_files($1)
+	sapnw_create_tmp_files($1)
+	sapnw_create_work_files($1)
 ')

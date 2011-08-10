@@ -11,16 +11,16 @@
 # /usr/sap
 #
 /usr/sap(/.*)?					gen_context(system_u:object_r:usr_t)
+/usr/sap/hostctrl/exe(/.*)?		--	gen_context(system_u:object_r:bin_t)
 /usr/sap/hostctrl/exe/saphostexec	--	gen_context(system_u:object_r:sapnw_initrc_exec_t)
 /usr/sap/hostctrl/exe/saposcol		--	gen_context(system_u:object_r:sapnw_oscol_exec_t)
 /usr/sap/hostctrl/exe/host_profile	--	gen_context(system_u:object_r:sapnw_etc_t)
-/usr/sap/hostctrl/work(/.*)?			gen_context(system_u:object_r:sapnw_log_t)
+/usr/sap/hostctrl/work(/.*)?			gen_context(system_u:object_r:sapnw_work_t)
 /usr/sap/[^/]+/[^/]+/exe(/.*)?			gen_context(system_u:object_r:bin_t)
 /usr/sap/[^/]+/[^/]+/exe(/.*)?\.so		gen_context(system_u:object_r:lib_t)
 /usr/sap/[^/]+/[^/]+/exe/sapstartsrv	--	gen_context(system_u:object_r:sapnw_exec_t)
-/usr/sap/[^/]+/[^/]+/exe/sapcontrol	--	gen_context(system_u:object_r:sapnw_script_exec_t)
-/usr/sap/[^/]+/[^/]+/exe/R3trans	--	gen_context(system_u:object_r:sapnw_script_exec_t)
-/usr/sap/[^/]+/[^/]+/work(/.*)?			gen_context(system_u:object_r:sapnw_log_t)
+/usr/sap/[^/]+/[^/]+/work(/.*)?			gen_context(system_u:object_r:sapnw_work_t)
+/usr/sap/[^/]+/[^/]+/log(/.*)?			gen_context(system_u:object_r:sapnw_work_t)
 /usr/sap/tmp(/.*)?				gen_context(system_u:object_r:sapnw_tmp_t)
 
 
@@ -28,3 +28,8 @@
 # /sapmnt
 #
 /sapmnt(/.*)?					gen_context(system_u:object_r:usr_t)
+/sapmnt/[^/]+/exe/jvm(/.*)?/bin(/.*)?	--	gen_context(system_u:object_r:bin_t)
+/sapmnt/[^/]+/exe/(n)?uc(/.*)?		--	gen_context(system_u:object_r:bin_t)
+/sapmnt/[^/]+/exe/(n)?uc(/.*)?\.so(\.[0-9]+)?	--	gen_context(system_u:object_r:lib_t)
+/sapmnt/[^/]+/global(/.*)?			gen_context(system_u:object_r:sapnw_work_t)
+/sapmnt/[^/]+/profile(/.*)?			gen_context(system_u:object_r:sapnw_work_t)

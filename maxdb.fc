@@ -5,52 +5,69 @@
 #
 # Init scripts
 #
-/usr/sap/[^/]+/SYS/exe(/.*)?/startdb		--	gen_context(system_u:object_r:maxdb_initrc_exec_t)
-/usr/sap/[^/]+/SYS/exe(/.*)?/stopdb		--	gen_context(system_u:object_r:maxdb_initrc_exec_t)
+/sapmnt/[^/]+/exe(/.*)?/startdb			--	gen_context(system_u:object_r:maxdb_initrc_exec_t)
+/sapmnt/[^/]+/exe(/.*)?/stopdb			--	gen_context(system_u:object_r:maxdb_initrc_exec_t)
+#/usr/sap/[^/]+/SYS/exe(/.*)?/startdb		--	gen_context(system_u:object_r:maxdb_initrc_exec_t)
+#/usr/sap/[^/]+/SYS/exe(/.*)?/stopdb		--	gen_context(system_u:object_r:maxdb_initrc_exec_t)
 
 #
 # /sapdb
 #
-/sapdb(/.*)?						gen_context(system_u:object_r:usr_t)
-
-/sapdb/clients/[^/]+/bin(/.*)?				gen_context(system_u:object_r:bin_t)
-/sapdb/clients/[^/]+/config(/.*)?			gen_context(system_u:object_r:maxdb_etc_t)
-/sapdb/clients/[^/]+/lib(/.*)?				gen_context(system_u:object_r:lib_t)
-/sapdb/clients/[^/]+/pgm(/.*)?				gen_context(system_u:object_r:bin_t)
-
-/sapdb/data(/.*)?					gen_context(system_u:object_r:maxdb_db_t)
-/sapdb/data/config(/.*)?				gen_context(system_u:object_r:maxdb_etc_t)
-
-/sapdb/programs(/.*)?					gen_context(system_u:object_r:bin_t)
-/sapdb/programs/bin/SDBINFO.PRT			--	gen_context(system_u:object_r:maxdb_etc_t)
-/sapdb/programs/bin/getdbroot			--	gen_context(system_u:object_r:maxdb_exec_t)
-/sapdb/programs/bin/sdbgloballistener		--	gen_context(system_u:object_r:maxdb_exec_t)
-/sapdb/programs/bin/x_server			--	gen_context(system_u:object_r:maxdb_exec_t)
-/sapdb/programs/env(/.*)?				gen_context(system_u:object_r:maxdb_etc_t)
-/sapdb/programs/install/SDBRUN			--	gen_context(system_u:object_r:bin_t)
-/sapdb/programs/install/.*\.so(\.[0-9]+)?	--	gen_context(system_u:object_r:lib_t)
-/sapdb/programs/lib(/.*)?				gen_context(system_u:object_r:lib_t)
-/sapdb/programs/pgm(/.*)?				gen_context(system_u:object_r:bin_t)
-
-/sapdb/[^/]+/data(/.*)?					gen_context(system_u:object_r:maxdb_db_t)
-/sapdb/[^/]+/db/bin(/.*)?				gen_context(system_u:object_r:bin_t)
-/sapdb/[^/]+/db/bin/x_server			--	gen_context(system_u:object_r:maxdb_exec_t)
-/sapdb/[^/]+/db/config(/.*)?				gen_context(system_u:object_r:maxdb_etc_t)
-/sapdb/[^/]+/db/dqe(/.*)?				gen_context(system_u:object_r:lib_t)
-/sapdb/[^/]+/db/etc(/.*)?				gen_context(system_u:object_r:maxdb_etc_t)
-/sapdb/[^/]+/db/install/SDBRUN			--	gen_context(system_u:object_r:bin_t)
-/sapdb/[^/]+/db/install/.*\.so(\.[0-9]+)?	--	gen_context(system_u:object_r:lib_t)
-/sapdb/[^/]+/db/lib(/.*)?			--	gen_context(system_u:object_r:lib_t)
-/sapdb/[^/]+/db/misc/.*\.sh			--	gen_context(system_u:object_r:bin_t)
-/sapdb/[^/]+/db/pgm(/.*)?				gen_context(system_u:object_r:bin_t)
-/sapdb/[^/]+/db/pgm/dbmsrv			--	gen_context(system_u:object_r:maxdb_exec_t)
-/sapdb.[^/]+/db/sap/lcinit			--	gen_context(system_u:object_r:bin_t)
-/sapdb.[^/]+/db/sap/.*\.so(\.[0-9]+)?		--	gen_context(system_u:object_r:lib_t)
+/sapdb(/.*)?						gen_context(system_u:object_r:maxdb_work_t)
 /sapdb/[^/]+/sapdata(/.*)?				gen_context(system_u:object_r:maxdb_db_t)
 /sapdb/[^/]+/saplog(/.*)?				gen_context(system_u:object_r:maxdb_db_t)
+/sapdb(/.*)/bin(/.*)?				--	gen_context(system_u:object_r:bin_t)
+/sapdb(/.*)/pgm(/.*)?				--	gen_context(system_u:object_r:bin_t)
+
+/sapdb(/.*)?/bin/getdbroot			--	gen_context(system_u:object_r:maxdb_exec_t)
+/sapdb(/.*)?/bin/sdbgloballistener		--	gen_context(system_u:object_r:maxdb_exec_t)
+/sapdb(/.*)?/bin/x_server			--	gen_context(system_u:object_r:maxdb_exec_t)
+
+/sapdb(/.*)?/lib(/.*)					gen_context(system_u:object_r:lib_t)
+/sapdb(/.*)?/.*\.so(\.[0-9]+)?			--	gen_context(system_u:object_r:lib_t)
+
+
+
+
+
+
+#/sapdb/clients/[^/]+/bin(/.*)?				gen_context(system_u:object_r:bin_t)
+#/sapdb/clients/[^/]+/config(/.*)?			gen_context(system_u:object_r:maxdb_etc_t)
+#/sapdb/clients/[^/]+/lib(/.*)?				gen_context(system_u:object_r:lib_t)
+#/sapdb/clients/[^/]+/pgm(/.*)?				gen_context(system_u:object_r:bin_t)
+
+#/sapdb/data(/.*)?					gen_context(system_u:object_r:maxdb_db_t)
+#/sapdb/data/config(/.*)?				gen_context(system_u:object_r:maxdb_etc_t)
+
+#/sapdb/programs(/.*)?					gen_context(system_u:object_r:bin_t)
+#/sapdb/programs/bin/SDBINFO.PRT			--	gen_context(system_u:object_r:maxdb_etc_t)
+#/sapdb/programs/bin/getdbroot			--	gen_context(system_u:object_r:maxdb_exec_t)
+#/sapdb/programs/bin/sdbgloballistener		--	gen_context(system_u:object_r:maxdb_exec_t)
+#/sapdb/programs/bin/x_server			--	gen_context(system_u:object_r:maxdb_exec_t)
+#/sapdb/programs/env(/.*)?				gen_context(system_u:object_r:maxdb_etc_t)
+#/sapdb/programs/install/SDBRUN			--	gen_context(system_u:object_r:bin_t)
+#/sapdb/programs/install/.*\.so(\.[0-9]+)?	--	gen_context(system_u:object_r:lib_t)
+#/sapdb/programs/lib(/.*)?				gen_context(system_u:object_r:lib_t)
+#/sapdb/programs/pgm(/.*)?				gen_context(system_u:object_r:bin_t)
+
+#/sapdb/[^/]+/data(/.*)?					gen_context(system_u:object_r:maxdb_db_t)
+#/sapdb/[^/]+/db/bin(/.*)?				gen_context(system_u:object_r:bin_t)
+#/sapdb/[^/]+/db/bin/x_server			--	gen_context(system_u:object_r:maxdb_exec_t)
+#/sapdb/[^/]+/db/config(/.*)?				gen_context(system_u:object_r:maxdb_etc_t)
+#/sapdb/[^/]+/db/dqe(/.*)?				gen_context(system_u:object_r:lib_t)
+#/sapdb/[^/]+/db/etc(/.*)?				gen_context(system_u:object_r:maxdb_etc_t)
+#/sapdb/[^/]+/db/install/SDBRUN			--	gen_context(system_u:object_r:bin_t)
+#/sapdb/[^/]+/db/install/.*\.so(\.[0-9]+)?	--	gen_context(system_u:object_r:lib_t)
+#/sapdb/[^/]+/db/lib(/.*)?			--	gen_context(system_u:object_r:lib_t)
+#/sapdb/[^/]+/db/misc/.*\.sh			--	gen_context(system_u:object_r:bin_t)
+#/sapdb/[^/]+/db/pgm(/.*)?				gen_context(system_u:object_r:bin_t)
+#/sapdb/[^/]+/db/pgm/dbmsrv			--	gen_context(system_u:object_r:maxdb_exec_t)
+#/sapdb.[^/]+/db/sap/lcinit			--	gen_context(system_u:object_r:bin_t)
+#/sapdb.[^/]+/db/sap/.*\.so(\.[0-9]+)?		--	gen_context(system_u:object_r:lib_t)
+#/sapdb/[^/]+/sapdata(/.*)?				gen_context(system_u:object_r:maxdb_db_t)
+#/sapdb/[^/]+/saplog(/.*)?				gen_context(system_u:object_r:maxdb_db_t)
 
 #
 # /var/lib/sdb
 #
 /var/lib/sdb(/.*)?					gen_context(system_u:object_r:maxdb_var_lib_t)
-
