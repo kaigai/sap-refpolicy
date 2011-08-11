@@ -75,9 +75,11 @@ interface(`sapnw_create_tmpfs_files',`
 		type sapnw_tmpfs_t;
 	')
 
+	fs_getattr_tmpfs($1)
 	fs_search_tmpfs($1)
 	fs_tmpfs_filetrans($1, sapnw_tmpfs_t, file)
 	manage_files_pattern($1, sapnw_tmpfs_t, sapnw_tmpfs_t)
+	mmap_files_pattern($1, sapnw_tmpfs_t, sapnw_tmpfs_t)
 ')
 
 ########################################
@@ -118,7 +120,74 @@ interface(`sapnw_create_work_files',`
 	')
 	manage_dirs_pattern($1, sapnw_work_t, sapnw_work_t)
 	manage_files_pattern($1, sapnw_work_t, sapnw_work_t)
+	manage_lnk_files_pattern($1, sapnw_work_t, sapnw_work_t)
 	manage_sock_files_pattern($1, sapnw_work_t, sapnw_work_t)
+')
+
+interface(`sapnw_read_var_run',`
+	gen_require(`
+		type sapnw_var_run_t;
+	')
+	read_files_pattern($1, var_run_t, sapnw_var_run_t)
+')
+
+########################################
+## <summary>
+##	Allow a domain to execute commands of SAP NetWeaver
+##	without domain transition.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`sapnw_exec',`
+	gen_require(`
+		type sapnw_exec_t;
+	')
+	corecmd_search_bin($1)
+	can_exec($1, sapnw_exec_t)
+')
+
+########################################
+## <summary>
+##	Allow the specified domain to connect to SAP NetWeaver with a tcp socket.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`sapnw_tcp_connect',`
+	gen_require(`
+		type sapnw_t;
+	')
+
+	corenet_tcp_recvfrom_labeled($1, sapnw_t)
+	corenet_tcp_sendrecv_sapnw_port($1)
+	corenet_tcp_connect_sapnw_port($1)
+	corenet_sendrecv_sapnw_client_packets($1)
+')
+
+########################################
+## <summary>
+##      Allow the specified domain to connect to postgresql with a unix socket.
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+## <rolecap/>
+#
+interface(`sapnw_stream_connect',`
+	gen_require(`
+		type sapnw_t, sapnw_tmp_t;
+        ')
+	allow $1 sapnw_t:unix_stream_socket connectto;
+	allow $1 sapnw_tmp_t:sock_file write;
 ')
 
 ########################################
@@ -160,4 +229,9 @@ interface(`sapnw_admin',`
 	sapnw_create_tmpfs_files($1)
 	sapnw_create_tmp_files($1)
 	sapnw_create_work_files($1)
+	sapnw_read_var_run($1)
+	sapnw_exec($1)
+
+	sapnw_stream_connect($1)
+	sapnw_tcp_connect($1)
 ')

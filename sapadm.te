@@ -1,27 +1,11 @@
-policy_module(sapadm, 1.0.1)
+policy_module(sapadm, 1.0.6)
 
 ########################################
 #
 # Declarations
 #
 
-## <desc>
-## <p>
-## Allow sapadm to manage files in users home directories
-## </p>
-## </desc>
-gen_tunable(sapadm_manage_user_files, true)
-
-## <desc>
-## <p>
-## Allow sapadm to read files in users home directories
-## </p>
-## </desc>
-gen_tunable(sapadm_read_user_files, true)
-
 role sapadm_r;
-
-
 
 userdom_base_user_template(sapadm)
 
@@ -30,16 +14,26 @@ userdom_base_user_template(sapadm)
 # SAP administrator local policy
 #
 
-tunable_policy(`sapadm_manage_user_files',`
-	userdom_manage_user_home_content_files(sapadm_t)
-	userdom_read_user_tmp_files(sapadm_t)
-	userdom_write_user_tmp_files(sapadm_t)
-')
+allow sapadm_t self:capability { dac_override dac_read_search setgid setuid sys_ptrace };
 
-tunable_policy(`sapadm_read_user_files',`
-	userdom_read_user_home_content_files(sapadm_t)
-	userdom_read_user_tmp_files(sapadm_t)
-')
+dev_read_rand(sapadm_t)
+init_read_utmp(sapadm_t)
+kernel_read_system_state(sapadm_t)
+logging_send_syslog_msg(sapadm_t)
+netutils_run_ping(sapadm_t, sapadm_r)
+
+
+sysnet_run_ifconfig(sapadm_t, sapadm_r)
+
+
+# SAP NW create its logfile on /home/XXXadm/*.log
+userdom_manage_user_home_content_dirs(sapadm_t)
+userdom_manage_user_home_content_files(sapadm_t)
+userdom_manage_user_home_content_symlinks(sapadm_t)
+userdom_user_home_dir_filetrans_user_home_content(sapadm_t, file)
+
+userdom_read_user_tmp_files(sapadm_t)
+userdom_write_user_tmp_files(sapadm_t)
 
 optional_policy(`
 	maxdb_admin(sapadm_t, sapadm_r)
@@ -47,4 +41,13 @@ optional_policy(`
 
 optional_policy(`
 	sapnw_admin(sapadm_t, sapadm_r)
+')
+
+optional_policy(`
+	nscd_read_pid(sapadm_t)
+')
+
+optional_policy(`
+	su_exec(sapadm_t)
+	selinux_compute_access_vector(sapadm_t)
 ')

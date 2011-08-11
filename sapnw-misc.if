@@ -67,6 +67,13 @@ interface(`corenet_tcp_connect_sapnw_port',`
 	allow $1 sapnw_port_t:tcp_socket name_connect;
 ')
 
+interface(`corenet_udp_connect_sapnw_port',`
+	gen_require(`
+		type sapnw_port_t;
+	')
+	allow $1 sapnw_port_t:udp_socket name_connect;
+')
+
 interface(`corenet_sendrecv_sapnw_server_packets',`
 	gen_require(`
 		type sapnw_server_packet_t;

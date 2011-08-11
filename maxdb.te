@@ -1,4 +1,4 @@
-policy_module(maxdb, 1.0.13)
+policy_module(maxdb, 1.0.15)
 
 ########################################
 #
@@ -12,17 +12,23 @@ init_daemon_domain(maxdb_t, maxdb_exec_t)
 type maxdb_db_t;
 files_type(maxdb_db_t)
 
-type maxdb_etc_t;
-files_type(maxdb_etc_t)
+#type maxdb_etc_t;
+#files_type(maxdb_etc_t)
 
 type maxdb_initrc_exec_t;
 init_script_file(maxdb_initrc_exec_t)
 
-type maxdb_log_t;
-logging_log_file(maxdb_log_t)
+#type maxdb_log_t;
+#logging_log_file(maxdb_log_t)
 
 type maxdb_tmp_t;
 files_tmp_file(maxdb_tmp_t)
+
+type maxdb_tmpfs_t;
+files_tmpfs_file(maxdb_tmpfs_t)
+
+type maxdb_work_t;
+files_type(maxdb_work_t)
 
 type maxdb_var_lib_t;
 files_type(maxdb_var_lib_t)
@@ -49,22 +55,18 @@ manage_dirs_pattern(maxdb_t, maxdb_db_t, maxdb_db_t)
 manage_files_pattern(maxdb_t, maxdb_db_t, maxdb_db_t)
 manage_fifo_files_pattern(maxdb_t, maxdb_db_t, maxdb_db_t)
 
+maxdb_create_tmp_files(maxdb_t)
+maxdb_create_tmpfs_files(maxdb_t)
+maxdb_create_work_files(maxdb_t)
 maxdb_exec(maxdb_t)
-
-manage_dirs_pattern(maxdb_t, maxdb_tmp_t, maxdb_tmp_t)
-manage_files_pattern(maxdb_t, maxdb_tmp_t, maxdb_tmp_t)
-manage_sock_files_pattern(maxdb_t, maxdb_tmp_t, maxdb_tmp_t)
-
-files_tmp_filetrans(maxdb_t, maxdb_tmp_t, { sock_file })
-fs_tmpfs_filetrans(maxdb_t, maxdb_tmp_t, { file dir })
 
 manage_dirs_pattern(maxdb_t, maxdb_var_lib_t, maxdb_var_lib_t)
 manage_files_pattern(maxdb_t, maxdb_var_lib_t, maxdb_var_lib_t)
 files_var_lib_filetrans(maxdb_t, maxdb_var_lib_t, { file dir })
 
-allow maxdb_t maxdb_etc_t:file read_file_perms;
-allow maxdb_t maxdb_etc_t:lnk_file { getattr read };
-allow maxdb_t maxdb_etc_t:dir list_dir_perms;
+#allow maxdb_t maxdb_etc_t:file read_file_perms;
+#allow maxdb_t maxdb_etc_t:lnk_file { getattr read };
+#allow maxdb_t maxdb_etc_t:dir list_dir_perms;
 
 kernel_read_system_state(maxdb_t)
 kernel_read_kernel_sysctls(maxdb_t)
@@ -103,5 +105,6 @@ kernel_read_system_state(maxdb_t)
 miscfiles_read_localization(maxdb_t)
 
 optional_policy(`
+#	sapnw_create_tmpfs_files(maxdb_t)
 	sapnw_rw_shared_mem(maxdb_t)
 ')

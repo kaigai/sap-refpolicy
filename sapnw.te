@@ -1,4 +1,4 @@
-policy_module(sapnw, 1.0.17)
+policy_module(sapnw, 1.0.26)
 
 ########################################
 #
@@ -17,7 +17,8 @@ init_daemon_domain(sapnw_t, sapnw_exec_t)
 
 type sapnw_oscol_t;
 type sapnw_oscol_exec_t;
-init_daemon_domain(sapnw_oscol_t, sapnw_oscol_exec_t)
+domain_type(sapnw_oscol_t)
+domain_entry_file(sapnw_oscol_t, sapnw_oscol_exec_t)
 
 type sapnw_etc_t;
 files_config_file(sapnw_etc_t)
@@ -27,6 +28,9 @@ files_tmp_file(sapnw_tmp_t)
 
 type sapnw_tmpfs_t;
 files_tmpfs_file(sapnw_tmpfs_t)
+
+type sapnw_var_run_t;
+files_type(sapnw_var_run_t)
 
 type sapnw_work_t;
 files_type(sapnw_work_t)
@@ -39,8 +43,8 @@ init_script_file(sapnw_initrc_exec_t)
 # SAP NetWeaver local policy
 #
 
-allow sapnw_t self:capability { dac_override setgid setuid };
-allow sapnw_t self:process { sigkill signal setpgid };
+allow sapnw_t self:capability { chown fsetid fowner dac_override kill setgid setuid };
+allow sapnw_t self:process { sigkill signull signal setpgid };
 allow sapnw_t self:process { execmem execstack };
 allow sapnw_t self:fifo_file manage_fifo_file_perms;
 allow sapnw_t self:sem create_sem_perms;
@@ -66,8 +70,12 @@ corenet_tcp_sendrecv_all_ports(sapnw_t)
 corenet_udp_sendrecv_all_ports(sapnw_t)
 corenet_tcp_bind_generic_node(sapnw_t)
 corenet_udp_bind_generic_node(sapnw_t)
+corenet_tcp_bind_generic_port(sapnw_t)
+corenet_udp_bind_generic_port(sapnw_t)
+corenet_tcp_connect_generic_port(sapnw_t)
 corenet_tcp_bind_sapnw_port(sapnw_t)
 corenet_udp_bind_sapnw_port(sapnw_t)
+corenet_tcp_connect_sapnw_port(sapnw_t)
 
 dev_read_sysfs(sapnw_t)
 dev_read_rand(sapnw_t)
@@ -76,16 +84,24 @@ dev_read_urand(sapnw_t)
 files_read_etc_files(sapnw_t)
 files_read_usr_files(sapnw_t)
 
+libs_legacy_use_shared_libs(sapnw_t)
+
 sapnw_create_shared_mem(sapnw_t)
 sapnw_create_tmpfs_files(sapnw_t)
 sapnw_create_tmp_files(sapnw_t)
 sapnw_create_work_files(sapnw_t)
+sapnw_stream_connect(sapnw_t)
+
+# chmod
+allow sapnw_t sapnw_oscol_exec_t : file setattr_file_perms;
 
 init_read_script_tmp_files(sapnw_t)
 init_read_utmp(sapnw_t)
+init_signull(sapnw_t)
 
 domain_read_all_domains_state(sapnw_t)
 kernel_read_kernel_sysctls(sapnw_t)
+kernel_read_net_sysctls(sapnw_t)
 kernel_read_network_state(sapnw_t)
 kernel_read_system_state(sapnw_t)
 kernel_read_vm_sysctls(sapnw_t)
@@ -97,10 +113,15 @@ miscfiles_read_localization(sapnw_t)
 sysnet_read_config(sapnw_t)
 sysnet_exec_ifconfig(sapnw_t)
 
+# /var/run/saphostexec.run
+manage_files_pattern(sapnw_t, sapnw_var_run_t, sapnw_var_run_t)
+files_pid_filetrans(sapnw_t, sapnw_var_run_t, file)
+
 # SAP NW create its logfiles on /home/XXXadm/*.log
 userdom_manage_user_home_dirs(sapnw_t)
 userdom_manage_user_home_content_dirs(sapnw_t)
 userdom_manage_user_home_content_files(sapnw_t)
+userdom_user_home_dir_filetrans_user_home_content(sapnw_t, file)
 
 term_use_ptmx(sapnw_t)
 term_getattr_pty_fs(sapnw_t)
@@ -111,22 +132,25 @@ optional_policy(`
 optional_policy(`
 	hostname_exec(sapnw_t)
 ')
-optional_policy(`
+#optional_policy(`
 	maxdb_exec_cmd(sapnw_t)
 	maxdb_stream_connect(sapnw_t)
 	maxdb_tcp_connect(sapnw_t)
-	maxdb_read_config(sapnw_t)
-	maxdb_rw_work_files(sapnw_t)
-')
+#	maxdb_read_config(sapnw_t)
+#	maxdb_rw_work_files(sapnw_t)
+	maxdb_create_work_files(sapnw_t)
+#')
 
 ########################################
 #
 # SAP OSCol local policy
 #
+domtrans_pattern(sapnw_t, sapnw_oscol_exec_t, sapnw_oscol_t)
+
+allow sapnw_oscol_t self:process { signull };
 allow sapnw_oscol_t self:capability { chown dac_override fsetid setuid sys_ptrace };
 allow sapnw_oscol_t self:fifo_file rw_fifo_file_perms;
 #allow sapnw_oscol_t self:shm create_shm_perms;
-
 
 domain_read_all_domains_state(sapnw_oscol_t)
 
@@ -163,3 +187,7 @@ sapnw_create_tmpfs_files(sapnw_oscol_t)
 sapnw_create_tmp_files(sapnw_oscol_t)
 
 term_getattr_pty_fs(sapnw_oscol_t)
+
+optional_policy(`
+	nscd_read_pid(sapnw_oscol_t)
+')

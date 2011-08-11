@@ -94,28 +94,6 @@ interface(`maxdb_stream_connect',`
 
 ########################################
 ## <summary>
-##	Allow the specified domain to read maxdb's config
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-## <rolecap/>
-#
-interface(`maxdb_read_config',`
-	gen_require(`
-		type maxdb_etc_t;
-	')
-
-	files_search_etc($1)
-	allow $1 maxdb_etc_t:dir list_dir_perms;
-	allow $1 maxdb_etc_t:file read_file_perms;
-	allow $1 maxdb_etc_t:lnk_file read_lnk_file_perms;
-')
-
-########################################
-## <summary>
 ##	Search the directories that contain MaxDB
 ##	database storage.
 ## </summary>
@@ -134,6 +112,16 @@ interface(`maxdb_search_db',`
 	getattr_files_pattern($1, maxdb_db_t, maxdb_db_t)
 ')
 
+########################################
+## <summary>
+##	Alow a domain to execute MaxDB binaries without domain transition
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
 interface(`maxdb_exec_cmd',`
 	gen_require(`
 		type maxdb_exec_t;
@@ -144,6 +132,56 @@ interface(`maxdb_exec_cmd',`
 	can_exec($1, maxdb_initrc_exec_t)
 ')
 
+########################################
+## <summary>
+##	Allow a domain to create tmpfs files corresponding to MaxDB
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`maxdb_create_tmpfs_files',`
+	gen_require(`
+		type maxdb_tmpfs_t;
+	')
+
+	fs_search_tmpfs($1)
+	fs_tmpfs_filetrans($1, maxdb_tmpfs_t, file)
+	manage_files_pattern($1, maxdb_tmpfs_t, maxdb_tmpfs_t)
+')
+
+########################################
+## <summary>
+##	Alow a domain to create tmp files corresponding to MaxDB
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`maxdb_create_tmp_files',`
+	gen_require(`
+		type maxdb_tmp_t;
+	')
+	files_tmp_filetrans($1, maxdb_tmp_t, {file dir sock_file})
+	manage_dirs_pattern($1, maxdb_tmp_t, maxdb_tmp_t)
+	manage_files_pattern($1, maxdb_tmp_t, maxdb_tmp_t)
+	manage_sock_files_pattern($1, maxdb_tmp_t, maxdb_tmp_t)
+')
+
+########################################
+## <summary>
+##	Alow a domain to create working files corresponding to MaxDB
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
 interface(`maxdb_create_work_files',`
 	gen_require(`
 		type maxdb_work_t;
@@ -151,8 +189,19 @@ interface(`maxdb_create_work_files',`
 	manage_dirs_pattern($1, maxdb_work_t, maxdb_work_t)
 	manage_files_pattern($1, maxdb_work_t, maxdb_work_t)
 	manage_lnk_files_pattern($1, maxdb_work_t, maxdb_work_t)
+	manage_fifo_files_pattern($1, maxdb_work_t, maxdb_work_t)
 ')
 
+########################################
+## <summary>
+##	Alow a domain to read/write working files corresponding to MaxDB
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
 interface(`maxdb_rw_work_files',`
 	gen_require(`
 		type maxdb_work_t;
@@ -160,8 +209,19 @@ interface(`maxdb_rw_work_files',`
 	list_dirs_pattern($1, maxdb_work_t, maxdb_work_t)
 	rw_files_pattern($1, maxdb_work_t, maxdb_work_t)
 	rw_lnk_files_pattern($1, maxdb_work_t, maxdb_work_t)
+	rw_fifo_files_pattern($1, maxdb_work_t, maxdb_work_t)
 ')
 
+########################################
+## <summary>
+##	Alow a domain to read working files corresponding to MaxDB
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
 interface(`maxdb_read_work_files',`
 	gen_require(`
 		type maxdb_work_t;
@@ -169,6 +229,7 @@ interface(`maxdb_read_work_files',`
 	list_dirs_pattern($1, maxdb_work_t, maxdb_work_t)
 	read_files_pattern($1, maxdb_work_t, maxdb_work_t)
 	read_lnk_files_pattern($1, maxdb_work_t, maxdb_work_t)
+	read_fifo_files_pattern($1, maxdb_work_t, maxdb_work_t)
 ')
 
 ########################################
@@ -201,4 +262,5 @@ interface(`maxdb_admin',`
 
 	maxdb_tcp_connect($1)
 	maxdb_stream_connect($1)
+	maxdb_rw_work_files($1)
 ')
