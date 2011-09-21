@@ -1,4 +1,4 @@
-policy_module(sapnw, 1.0.26)
+policy_module(sapnw, 1.0.30)
 
 ########################################
 #
@@ -46,6 +46,7 @@ init_script_file(sapnw_initrc_exec_t)
 allow sapnw_t self:capability { chown fsetid fowner dac_override kill setgid setuid };
 allow sapnw_t self:process { sigkill signull signal setpgid };
 allow sapnw_t self:process { execmem execstack };
+allow sapnw_t sapnw_oscol_t:process signal_perms;
 allow sapnw_t self:fifo_file manage_fifo_file_perms;
 allow sapnw_t self:sem create_sem_perms;
 #allow sapnw_t self:shm create_shm_perms;
@@ -139,6 +140,9 @@ optional_policy(`
 #	maxdb_read_config(sapnw_t)
 #	maxdb_rw_work_files(sapnw_t)
 	maxdb_create_work_files(sapnw_t)
+	maxdb_rw_tmpfs_files(sapnw_t)
+	maxdb_rw_semaphores(sapnw_t)
+	maxdb_signal(sapnw_t)
 #')
 
 ########################################
@@ -146,6 +150,8 @@ optional_policy(`
 # SAP OSCol local policy
 #
 domtrans_pattern(sapnw_t, sapnw_oscol_exec_t, sapnw_oscol_t)
+
+role system_r types sapnw_oscol_t;
 
 allow sapnw_oscol_t self:process { signull };
 allow sapnw_oscol_t self:capability { chown dac_override fsetid setuid sys_ptrace };

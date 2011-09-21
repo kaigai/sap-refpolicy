@@ -28,8 +28,12 @@ interface(`maxdb_domtrans',`
 ##	</summary>
 ## </param>
 #
-
-
+interface(`maxdb_signal',`
+	gen_require(`
+		type maxdb_t;
+	')
+	allow $1 maxdb_t:process signal_perms;
+')
 
 ########################################
 ## <summary>
@@ -134,6 +138,23 @@ interface(`maxdb_exec_cmd',`
 
 ########################################
 ## <summary>
+##	Allow a domain to up/dowm semaphores corresponding to MaxDB
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`maxdb_rw_semaphores',`
+	gen_require(`
+		type maxdb_t;
+	')
+	allow $1 maxdb_t:sem create_sem_perms;
+')
+
+########################################
+## <summary>
 ##	Allow a domain to create tmpfs files corresponding to MaxDB
 ## </summary>
 ## <param name="domain">
@@ -150,6 +171,26 @@ interface(`maxdb_create_tmpfs_files',`
 	fs_search_tmpfs($1)
 	fs_tmpfs_filetrans($1, maxdb_tmpfs_t, file)
 	manage_files_pattern($1, maxdb_tmpfs_t, maxdb_tmpfs_t)
+	mmap_files_pattern($1, maxdb_tmpfs_t, maxdb_tmpfs_t)
+')
+
+########################################
+## <summary>
+##	Allow a domain to create tmpfs files corresponding to MaxDB
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`maxdb_rw_tmpfs_files',`
+	gen_require(`
+		type maxdb_tmpfs_t;
+	')
+	fs_search_tmpfs($1)
+	manage_files_pattern($1, maxdb_tmpfs_t, maxdb_tmpfs_t)
+	mmap_files_pattern($1, sapnw_tmpfs_t, sapnw_tmpfs_t)
 ')
 
 ########################################
@@ -262,5 +303,7 @@ interface(`maxdb_admin',`
 
 	maxdb_tcp_connect($1)
 	maxdb_stream_connect($1)
-	maxdb_rw_work_files($1)
+	maxdb_create_work_files($1)
+	maxdb_rw_tmpfs_files($1)
+	maxdb_rw_semaphores($1)
 ')

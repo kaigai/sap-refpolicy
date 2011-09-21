@@ -1,4 +1,4 @@
-policy_module(sapadm, 1.0.6)
+policy_module(sapadm, 1.0.7)
 
 ########################################
 #
@@ -18,8 +18,11 @@ allow sapadm_t self:capability { dac_override dac_read_search setgid setuid sys_
 
 dev_read_rand(sapadm_t)
 init_read_utmp(sapadm_t)
+kernel_get_sysvipc_info(sapadm_t)
 kernel_read_system_state(sapadm_t)
+logging_send_audit_msgs(sapadm_t)
 logging_send_syslog_msg(sapadm_t)
+
 netutils_run_ping(sapadm_t, sapadm_r)
 
 

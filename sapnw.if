@@ -36,7 +36,6 @@ interface(`sapnw_create_shared_mem',`
 	gen_require(`
 		attribute sapnw_shared_mem_type;
 	')
-
 	typeattribute $1 sapnw_shared_mem_type;
 	allow $1 sapnw_shared_mem_type:shm create_shm_perms;
 ')
@@ -78,6 +77,26 @@ interface(`sapnw_create_tmpfs_files',`
 	fs_getattr_tmpfs($1)
 	fs_search_tmpfs($1)
 	fs_tmpfs_filetrans($1, sapnw_tmpfs_t, file)
+	manage_files_pattern($1, sapnw_tmpfs_t, sapnw_tmpfs_t)
+	mmap_files_pattern($1, sapnw_tmpfs_t, sapnw_tmpfs_t)
+')
+
+########################################
+## <summary>
+##	Allow a domain to create tmpfs entries corresponding to
+##	SAP NetWeaver.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`sapnw_rw_tmpfs_files',`
+	gen_require(`
+		type sapnw_tmpfs_t;
+	')
+	fs_search_tmpfs($1)
 	manage_files_pattern($1, sapnw_tmpfs_t, sapnw_tmpfs_t)
 	mmap_files_pattern($1, sapnw_tmpfs_t, sapnw_tmpfs_t)
 ')

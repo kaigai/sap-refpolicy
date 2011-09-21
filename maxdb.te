@@ -1,4 +1,4 @@
-policy_module(maxdb, 1.0.15)
+policy_module(maxdb, 1.0.18)
 
 ########################################
 #
@@ -104,7 +104,16 @@ kernel_read_system_state(maxdb_t)
 
 miscfiles_read_localization(maxdb_t)
 
+#
+# MaxDB creates its log files on /home/XXXadm/(start|stop)db.log
+#
+userdom_manage_user_home_content_dirs(maxdb_t)
+userdom_manage_user_home_content_files(maxdb_t)
+userdom_user_home_dir_filetrans_user_home_content(maxdb_t, { dir file })
+
+
+
 optional_policy(`
-#	sapnw_create_tmpfs_files(maxdb_t)
-	sapnw_rw_shared_mem(maxdb_t)
+	sapnw_rw_tmpfs_files(maxdb_t)
+	sapnw_create_shared_mem(maxdb_t)
 ')

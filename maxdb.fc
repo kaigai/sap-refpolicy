@@ -19,6 +19,7 @@
 /sapdb(/.*)?/bin/sdbgloballistener		--	gen_context(system_u:object_r:maxdb_exec_t)
 /sapdb(/.*)?/bin/x_server			--	gen_context(system_u:object_r:maxdb_exec_t)
 /sapdb(/.*)?/pgm(/.*)?				--	gen_context(system_u:object_r:bin_t)
+/sapdb(/.*)?/pgm/dbmsrv				--	gen_context(system_u:object_r:maxdb_exec_t)
 /sapdb(/.*)?/lib(/.*)?					gen_context(system_u:object_r:lib_t)
 /sapdb(/.*)?/.*\.so(\.[0-9]+)?			--	gen_context(system_u:object_r:lib_t)
 
